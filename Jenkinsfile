@@ -16,18 +16,22 @@ pipeline {
             }
         }
 
-    stage('Clean Existing Container') {
-        steps {
-            script {
-                bat """
-                FOR /F "tokens=*" %%i IN ('docker ps -aq -f "name=${CONTAINER_NAME}"') DO (
-                    docker stop %%i || echo "No running container"
-                    docker rm %%i || echo "No container to remove"
-                )
-                """
+     stage('Clean Existing Container') { // Pindahkan ke awal
+            steps {
+                script {
+                    powershell """
+                        \$containerId = docker ps -aq -f "name=${CONTAINER_NAME}"
+                        if (\$containerId) {
+                            echo "Stopping and removing container: \$containerId"
+                            docker stop \$containerId
+                            docker rm \$containerId
+                        } else {
+                            echo "No container to remove"
+                        }
+                    """
+                }
             }
         }
-    }
 
 
         stage('Run Docker Container') {
