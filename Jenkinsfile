@@ -16,18 +16,18 @@ pipeline {
             }
         }
 
-    // stage('Clean Existing Container') {
-    //     steps {
-    //         script {
-    //             bat """
-    //             FOR /F "tokens=*" %%i IN ('docker ps -aq -f "name=${CONTAINER_NAME}"') DO (
-    //                 docker stop %%i || echo "No running container"
-    //                 docker rm %%i || echo "No container to remove"
-    //             )
-    //             """
-    //         }
-    //     }
-    // }
+    stage('Clean Existing Container') {
+        steps {
+            script {
+                bat """
+                FOR /F "tokens=*" %%i IN ('docker ps -aq -f "name=${CONTAINER_NAME}"') DO (
+                    docker stop %%i || echo "No running container"
+                    docker rm %%i || echo "No container to remove"
+                )
+                """
+            }
+        }
+    }
 
 
         stage('Run Docker Container') {
