@@ -4,42 +4,10 @@ pipeline {
     environment {
         DOCKER_IMAGE = 'harizdizasantoso/projectrevisi:latest'
         CONTAINER_NAME = 'revisi'
-        PORT_MAPPING = '8090:80'
+        PORT_MAPPING = '8086:80'  // Adjust the port mapping as needed
     }
 
-        stage('Clean Existing Container') { // Pindahkan ke awal
-            steps {
-                script {
-                    powershell """
-                        \$containerId = docker ps -aq -f "name=${CONTAINER_NAME}"
-                        if (\$containerId) {
-                            echo "Stopping and removing container: \$containerId"
-                            docker stop \$containerId
-                            docker rm \$containerId
-                        } else {
-                            echo "No container to remove"
-                        }
-                    """
-                }
-            }
-        }
-
-        stage('Clean Existing Docker Image') {
-            steps {
-                script {
-                    powershell """
-                        \$imageId = docker images -q ${DOCKER_IMAGE}
-                        if (\$imageId) {
-                            echo "Removing existing image: \$imageId"
-                            docker rmi \$imageId -f
-                        } else {
-                            echo "No existing image to remove"
-                        }
-                    """
-                }
-            }
-        }
-
+    stages {
         stage('Build Docker Image') {
             steps {
                 script {
@@ -48,10 +16,25 @@ pipeline {
             }
         }
 
+    stage('Clean Existing Container') {
+        steps {
+            script {
+                bat """
+                FOR /F "tokens=*" %%i IN ('docker ps -aq -f "name=${CONTAINER_NAME}"') DO (
+                    docker stop %%i || echo "No running container"
+                    docker rm %%i || echo "No container to remove"
+                )
+                """
+            }
+        }
+    }
+
+
         stage('Run Docker Container') {
             steps {
                 script {
-                    docker.image("${DOCKER_IMAGE}").run("-p ${PORT_MAPPING} --name ${CONTAINER_NAME}")
+                    // Run Docker container based on the built image
+                    docker.image("${DOCKER_IMAGE}").run("-d -p ${PORT_MAPPING} --name ${CONTAINER_NAME}")
                 }
             }
         }
