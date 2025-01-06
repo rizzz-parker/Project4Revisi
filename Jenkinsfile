@@ -2,9 +2,9 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE = 'dentowahyu/parking:latest'
-        CONTAINER_NAME = 'parking'
-        PORT_MAPPING = '8020:80'
+        DOCKER_IMAGE = 'harizdizasantoso/projectrevisi:latest'
+        CONTAINER_NAME = 'revisi'
+        PORT_MAPPING = '8090:80'
     }
 
         stage('Clean Existing Container') { // Pindahkan ke awal
